@@ -61,6 +61,31 @@ Then restart Homebridge and configure the plugin as described below.
 > npm may warn that the `prepare` script is "not yet covered by allowScripts".
 > That is harmless: the committed `dist/` output is used either way.
 
+#### Homebridge with a managed plugin directory
+
+If the Homebridge log shows startup flags like:
+
+```text
+Starting Homebridge with extra flags: -P /var/lib/homebridge/node_modules --strict-plugin-resolution
+```
+
+then Homebridge only loads plugins from that directory. The Homebridge UI sets
+these flags when it manages plugins locally, and a global install is invisible
+to both Homebridge and the UI plugin list. Install into the plugin directory
+instead:
+
+```bash
+npm uninstall -g homebridge-emporia-matter
+cd /var/lib/homebridge
+npm install github:dmitripr/homebridge-emporia-matter --install-links --save
+```
+
+Verify that the plugin is in the directory named by `-P`:
+
+```bash
+ls /var/lib/homebridge/node_modules/homebridge-emporia-matter/dist/index.js
+```
+
 ### Docker
 
 Run the install inside the Homebridge container, then restart it:
@@ -230,9 +255,13 @@ Plugins search only queries the npm registry, so a GitHub install will not
 appear there; look under the installed plugins list after Homebridge reloads.
 If it still does not appear, check the Homebridge log for
 `homebridge-emporia-matter` and add the platform block manually — the plugin
-runs without a settings card. You can verify the install with
-`npm ls -g homebridge-emporia-matter` and
-`ls "$(npm root -g)/homebridge-emporia-matter/dist/index.js"`.
+runs without a settings card.
+
+If the log says `No plugin was found for the platform "EmporiaMatter"`, check
+the startup flags. When Homebridge runs with
+`-P /var/lib/homebridge/node_modules --strict-plugin-resolution`, it ignores
+globally installed plugins; install into that directory instead. See
+[Homebridge with a managed plugin directory](#homebridge-with-a-managed-plugin-directory).
 
 **No accessories appear**  
 Check the Homebridge log for authentication or API errors. You can verify credentials from a terminal with the auth smoke test described below. Make sure the bridge is paired with Apple Home and that the plugin is enabled.
