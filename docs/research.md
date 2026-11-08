@@ -11,7 +11,7 @@
 The design is feasible with the public Homebridge 2.5 Matter API and the (unofficial) Emporia cloud API:
 
 - **Matter side.** Homebridge ≥ 2.5.0 exposes a `MatterAPI` that lets a platform register Matter accessories directly. Declaring `electricalPowerMeasurement` and `electricalEnergyMeasurement` cluster state on an `OnOffOutlet` endpoint makes Homebridge add the `ElectricalSensor` device type and synthesize the mandatory accuracy metadata. This is the same shape Eve Energy and other metered plugs use, and it is the only shape known to show live wattage on an Apple Home tile.
-- **Emporia side.** Authentication is AWS Cognito (`USER_PASSWORD_AUTH`, then `REFRESH_TOKEN_AUTH`). Device metadata comes from `GET /v1/customers/devices`; instantaneous usage comes from `GET /v1/customers/devices/usages?scale=1MIN&energy_unit=KILOWATT_HOURS`. Usage values are **energy over the scale window**, not power, so watts must be derived (`kWh × 60 000` for a one-minute window).
+- **Emporia side.** Authentication is AWS Cognito (`USER_PASSWORD_AUTH`, then `REFRESH_TOKEN_AUTH`). Device metadata comes from `GET /v1/customers/devices`; instantaneous usage comes from `GET /v1/customers/devices/usages?scale=MINUTE&energy_unit=KILOWATT_HOURS`. The v1 API takes enum names (`SECOND`, `MINUTE`, ...), while the legacy `AppAPI` takes `1S`, `1MIN`, .... Usage values are **energy over the scale window**, not power, so watts must be derived (`kWh × 60 000` for a one-minute window).
 - **Energy total.** No lifetime kWh counter was found in the API. The plugin must integrate reported power over time, persist the total, and document that it is locally derived (resets if plugin storage is lost).
 - **Identity.** Matter endpoint identity must be deterministic and stable, derived from Emporia `device_gid` + `channel_id`, with a rotation generation for structural changes (split/grouped, accessory type, channel set). Cached accessories must be restored before the bridge goes online and re-registered with handlers on every start.
 - **Apple caveats.** Apple Home shows per-accessory energy only for accessories paired directly (not bridged children), assigns rooms per accessory (so split-by-channel is essential), and will double-count if mains and branch circuits are both exposed. These are product/documentation constraints, not bugs.
@@ -227,7 +227,7 @@ Primary (v1):
 
 ```
 GET https://api.emporiaenergy.com/v1/customers/devices
-GET https://api.emporiaenergy.com/v1/customers/devices/usages?device_gids=1001,1002&instant=<ISO8601>&scale=1MIN&energy_unit=KILOWATT_HOURS
+GET https://api.emporiaenergy.com/v1/customers/devices/usages?device_gids=1001,1002&instant=<ISO8601>&scale=MINUTE&energy_unit=KILOWATT_HOURS
 ```
 
 Fallback (legacy):
@@ -240,7 +240,7 @@ GET https://api.emporiaenergy.com/AppAPI?apiMethod=getDeviceListUsages&deviceGid
 Notes:
 
 - v1 `instant` is ISO-8601 UTC, e.g. `2026-11-01T20:10:20.657Z`. Legacy uses the same instant format.
-- `scale` values: `1S`, `1MIN`, `15MIN`, `1H`, `1D`, `1W`, `1MON`, `1Y`.
+- `scale` values: v1 uses `SECOND`, `MINUTE`, `15MINUTES`, `HOUR`, `DAY`, `WEEK`, `MONTH`, `YEAR`; legacy uses `1S`, `1MIN`, `15MIN`, `1H`, `1D`, `1W`, `1MON`, `1Y`.
 - `energy_unit`: `KILOWATT_HOURS` (v1) / `KilowattHours` (legacy). Also supports `VOLTAGE` for voltage-only calls, but we do not need it.
 - Multiple device GIDs are comma-separated. One call can cover all monitors on the account.
 - Device metadata should be fetched at startup and refreshed every ~15–60 minutes (or on a 404/unknown channel), not every poll. Usage is fetched every poll.
@@ -356,7 +356,7 @@ W = kWh_over_1min  × 60_000
 W = kWh_over_15min × 4_000
 ```
 
-For `scale=1MIN`, `W = usage × 60 000`. Then `mW = round(W × 1000)`.
+For `scale=MINUTE`, `W = usage × 60 000`. Then `mW = round(W × 1000)`.
 
 - Negative values: Emporia reports negative usage for solar/export in some configurations. Default: clamp to `0` for import-only channels and log a debug warning once. If `solar: true`, allow negative power and declare `cumulativeEnergyExported`.
 - Voltage: Emporia's usage API does not return per-channel voltage in the normal call. Options:

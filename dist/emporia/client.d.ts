@@ -29,6 +29,7 @@ export declare class EmporiaClient {
     private readonly log?;
     private readonly maxRetries;
     private readonly timeoutMs;
+    private readonly legacyEndpoints;
     constructor(options: EmporiaClientOptions);
     getDevices(): Promise<EmporiaDevice[]>;
     getUsage(deviceGids: readonly number[], instant?: Date): Promise<Map<number, DeviceUsage>>;

@@ -103,7 +103,7 @@ If you prefer to build on the machine first, or if install scripts are blocked:
 git clone https://github.com/dmitripr/homebridge-emporia-matter.git
 cd homebridge-emporia-matter
 npm pack
-npm install -g ./homebridge-emporia-matter-0.1.1.tgz
+npm install -g ./homebridge-emporia-matter-0.1.2.tgz
 ```
 
 ### Homebridge UI (after the npm release)

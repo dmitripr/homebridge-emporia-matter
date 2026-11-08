@@ -47,6 +47,10 @@ export class EmporiaClient {
   private readonly log?: ClientLogger;
   private readonly maxRetries: number;
   private readonly timeoutMs: number;
+  // Primary endpoints that returned a fallback-worthy status. Once a v1
+  // endpoint has failed, use the legacy endpoint directly instead of repeating
+  // the same rejected request on every poll.
+  private readonly legacyEndpoints = new Set<string>();
 
   constructor(options: EmporiaClientOptions) {
     this.auth = options.auth;
@@ -72,7 +76,8 @@ export class EmporiaClient {
     const v1Params: Record<string, string> = {
       device_gids: deviceGids.join(','),
       instant: instant.toISOString(),
-      scale: '1MIN',
+      // The v1 API takes enum names, unlike the legacy API's `1MIN`.
+      scale: 'MINUTE',
       energy_unit: 'KILOWATT_HOURS',
     };
     const legacyQuery = new URLSearchParams({
@@ -98,13 +103,16 @@ export class EmporiaClient {
     style: AuthStyle,
     params?: Record<string, string>,
   ): Promise<unknown> {
+    if (this.legacyEndpoints.has(primaryPath)) {
+      return this.request(fallbackPath, 'authtoken');
+    }
+
     try {
       return await this.request(primaryPath, style, params);
     } catch (error) {
       if (error instanceof EmporiaApiError && FALLBACK_STATUSES.has(error.status)) {
-        this.log?.warn(
-          `Emporia v1 endpoint ${primaryPath} unavailable (${error.status}); falling back to the legacy API.`,
-        );
+        this.legacyEndpoints.add(primaryPath);
+        this.log?.warn(`Emporia v1 endpoint unavailable; using the legacy API. ${error.message}`);
         return this.request(fallbackPath, 'authtoken');
       }
       throw error;

@@ -86,7 +86,7 @@ describe('EmporiaClient.getDevices', () => {
 });
 
 describe('EmporiaClient.getUsage', () => {
-  it('asks for 1MIN energy in kWh and parses the response', async () => {
+  it('asks for a one-minute energy window in kWh and parses the response', async () => {
     const fetchImpl = vi.fn(async () => jsonResponse(fixture('usages_v1.json')));
     const usage = await client(fetchImpl as unknown as typeof fetch).getUsage([1001, 1002], new Date('2026-11-01T20:10:20.657Z'));
 
@@ -94,9 +94,25 @@ describe('EmporiaClient.getUsage', () => {
     const [url] = fetchImpl.mock.calls[0] as unknown as [URL, RequestInit];
     expect(String(url)).toContain('/v1/customers/devices/usages');
     expect(String(url)).toContain('device_gids=1001%2C1002');
-    expect(String(url)).toContain('scale=1MIN');
+    expect(String(url)).toContain('scale=MINUTE');
     expect(String(url)).toContain('energy_unit=KILOWATT_HOURS');
     expect(String(url)).toContain('instant=2026-11-01T20%3A10%3A20.657Z');
+  });
+
+  it('uses the legacy endpoint on later calls after a v1 fallback', async () => {
+    const fetchImpl = vi.fn()
+      .mockResolvedValueOnce(jsonResponse({ message: 'bad scale' }, 400))
+      .mockResolvedValueOnce(jsonResponse(fixture('usages_legacy.json')))
+      .mockResolvedValueOnce(jsonResponse(fixture('usages_legacy.json')));
+    const emporia = client(fetchImpl as unknown as typeof fetch);
+
+    await emporia.getUsage([2001]);
+    await emporia.getUsage([2001]);
+
+    expect(fetchImpl).toHaveBeenCalledTimes(3);
+    const [url, init] = fetchImpl.mock.calls[2] as unknown as [URL, RequestInit];
+    expect(String(url)).toContain('/AppAPI?');
+    expect(init.headers).toMatchObject({ authtoken: 'id-token' });
   });
 
   it('falls back to the legacy AppAPI on 404', async () => {
