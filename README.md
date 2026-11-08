@@ -224,6 +224,16 @@ Open the bridge settings in the Homebridge UI and turn on **Enable Matter**, the
 **"This bridge is in Matter externals-only mode"**  
 Bridged accessories cannot be published in that mode. Use a normal Matter bridge for this plugin.
 
+**Installed but not shown in the Homebridge UI**  
+Restart Homebridge itself (the power menu, not just the browser or UI). The
+Plugins search only queries the npm registry, so a GitHub install will not
+appear there; look under the installed plugins list after Homebridge reloads.
+If it still does not appear, check the Homebridge log for
+`homebridge-emporia-matter` and add the platform block manually — the plugin
+runs without a settings card. You can verify the install with
+`npm ls -g homebridge-emporia-matter` and
+`ls "$(npm root -g)/homebridge-emporia-matter/dist/index.js"`.
+
 **No accessories appear**  
 Check the Homebridge log for authentication or API errors. You can verify credentials from a terminal with the auth smoke test described below. Make sure the bridge is paired with Apple Home and that the plugin is enabled.
 
