@@ -36,11 +36,15 @@ GitHub repository.
 On the machine running Homebridge, as the same user that runs Homebridge:
 
 ```bash
-npm install -g github:dmitripr/homebridge-emporia-matter
+npm install -g github:dmitripr/homebridge-emporia-matter --install-links
 ```
 
-npm clones the repository and installs it into the global npm prefix that
-Homebridge scans. Node.js 22.12+ and `git` are required.
+npm clones the repository and installs a real copy into the global npm prefix
+that Homebridge scans. Node.js 22.12+ and `git` are required.
+
+`--install-links` matters: without it, npm 11 can symlink a global git install
+to a temporary cache clone, leaving a broken package after the cache is
+cleaned.
 
 The repository includes the compiled `dist/` output, so global installs do not
 need devDependencies or a build step. Local checkouts rebuild automatically
@@ -62,7 +66,7 @@ Then restart Homebridge and configure the plugin as described below.
 Run the install inside the Homebridge container, then restart it:
 
 ```bash
-docker exec -it <container-name> npm install -g github:dmitripr/homebridge-emporia-matter
+docker exec -it <container-name> npm install -g github:dmitripr/homebridge-emporia-matter --install-links
 docker restart <container-name>
 ```
 
@@ -73,8 +77,6 @@ If you prefer to build on the machine first, or if install scripts are blocked:
 ```bash
 git clone https://github.com/dmitripr/homebridge-emporia-matter.git
 cd homebridge-emporia-matter
-npm install
-npm run build
 npm pack
 npm install -g ./homebridge-emporia-matter-0.1.0.tgz
 ```
