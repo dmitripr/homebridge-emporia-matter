@@ -1,6 +1,6 @@
 # Research: `homebridge-emporia-matter`
 
-**Status:** research complete, implementation not started
+**Status:** research complete; implemented in v0.1.0 (see README and CHANGELOG)
 **Date:** 2026-11-08
 **Scope:** A Matter-only Homebridge plugin that exposes Emporia Vue energy monitors (mains and branch circuits) as Matter electrical measurement devices, with live power and cumulative energy in Apple Home.
 
