@@ -28,20 +28,62 @@ This plugin is **Matter-only**. It does not publish HAP accessories and does not
 
 ## Install
 
-### Homebridge UI
+The plugin is not published to npm yet. Install it directly from the public
+GitHub repository.
 
-1. Open **Plugins**, search for `Emporia Matter`, and install it.
-2. Open the plugin settings and enter your Emporia email and password.
-3. Save and restart Homebridge.
-4. Make sure **Enable Matter** is on in the bridge settings (see below).
+### Install from GitHub
 
-### Command line
+On the machine running Homebridge, as the same user that runs Homebridge:
 
 ```bash
-npm install -g homebridge-emporia-matter
+npm install -g github:dmitripr/homebridge-emporia-matter
 ```
 
-Then add a platform block to `config.json` and restart Homebridge.
+npm clones the repository, runs the TypeScript build through the `prepare`
+script, and installs the compiled plugin into the global npm prefix that
+Homebridge scans. Node.js 22.12+ and `git` are required.
+
+Verify the install:
+
+```bash
+npm ls -g homebridge-emporia-matter
+```
+
+Then restart Homebridge and configure the plugin as described below.
+
+> npm 11 may warn that the `prepare` script is "not yet covered by
+> allowScripts". The build still runs; if `dist/index.js` is missing after
+> install, use the local tarball method below.
+
+### Docker
+
+Run the install inside the Homebridge container, then restart it:
+
+```bash
+docker exec -it <container-name> npm install -g github:dmitripr/homebridge-emporia-matter
+docker restart <container-name>
+```
+
+### Local tarball
+
+If you prefer to build on the machine first, or if install scripts are blocked:
+
+```bash
+git clone https://github.com/dmitripr/homebridge-emporia-matter.git
+cd homebridge-emporia-matter
+npm install
+npm run build
+npm pack
+npm install -g ./homebridge-emporia-matter-0.1.0.tgz
+```
+
+### Homebridge UI (after the npm release)
+
+Once the package is published, open **Plugins**, search for `Emporia Matter`,
+and install it. Until then, use one of the methods above and refresh the
+Homebridge UI.
+
+After installing, add the platform configuration and restart Homebridge.
 
 ## Homebridge and Matter setup
 
@@ -55,6 +97,10 @@ This plugin registers **bridged Matter accessories**, so the bridge itself must 
 The plugin refuses to start on Homebridge versions older than 2.5.0 and logs an actionable message when Matter is unavailable.
 
 ## Configuration
+
+In the Homebridge UI, open the plugin settings and enter your Emporia email and
+password; the form exposes every option below. For a manual setup, add a
+platform block to `config.json`.
 
 Minimal `config.json`:
 
