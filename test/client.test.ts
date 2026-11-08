@@ -62,6 +62,27 @@ describe('EmporiaClient.getDevices', () => {
     expect(String(url)).toBe('https://api.emporiaenergy.com/customers/devices');
     expect(init.headers).toMatchObject({ authtoken: 'id-token' });
   });
+
+  it('falls back to the legacy endpoint on 400', async () => {
+    const fetchImpl = vi.fn()
+      .mockResolvedValueOnce(jsonResponse({ message: 'bad request' }, 400))
+      .mockResolvedValueOnce(jsonResponse(fixture('devices_legacy.json')));
+    const devices = await client(fetchImpl as unknown as typeof fetch).getDevices();
+
+    expect(devices).toHaveLength(1);
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    const [url, init] = fetchImpl.mock.calls[1] as unknown as [URL, RequestInit];
+    expect(String(url)).toBe('https://api.emporiaenergy.com/customers/devices');
+    expect(init.headers).toMatchObject({ authtoken: 'id-token' });
+  });
+
+  it('includes the endpoint and response body in the error message', async () => {
+    const fetchImpl = vi.fn(async () => jsonResponse({ message: 'device_gids is required' }, 400));
+
+    await expect(client(fetchImpl as unknown as typeof fetch).getDevices()).rejects.toThrow(
+      /400\) at \/customers\/devices:.*device_gids is required/,
+    );
+  });
 });
 
 describe('EmporiaClient.getUsage', () => {

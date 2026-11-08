@@ -5,6 +5,15 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-11-08
+
+### Fixed
+
+- Try the legacy Emporia endpoints when the v1 endpoint returns 400 or 403, not
+  just 404 or 405.
+- Include the failing endpoint and a short response body in API errors so a
+  rejected request can be diagnosed from the Homebridge log.
+
 ## [0.1.0] - 2026-11-08
 
 ### Added
@@ -30,4 +39,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI matrix for Node 22/24/26 and tag-based npm publishing with provenance.
 - Environment-based live authentication smoke test.
 
+[0.1.1]: https://github.com/dmitripr/homebridge-emporia-matter/releases/tag/v0.1.1
 [0.1.0]: https://github.com/dmitripr/homebridge-emporia-matter/releases/tag/v0.1.0

@@ -8,6 +8,10 @@ export class EmporiaApiError extends Error {
         this.name = 'EmporiaApiError';
     }
 }
+// Statuses that mean the v1 endpoint itself is not usable for this account or
+// request, so the legacy endpoint is worth trying. A 401 is handled separately
+// by refreshing the token.
+const FALLBACK_STATUSES = new Set([400, 403, 404, 405]);
 export class EmporiaClient {
     auth;
     fetchImpl;
@@ -56,8 +60,8 @@ export class EmporiaClient {
             return await this.request(primaryPath, style, params);
         }
         catch (error) {
-            if (error instanceof EmporiaApiError && (error.status === 404 || error.status === 405)) {
-                this.log?.warn(`Emporia v1 endpoint unavailable (${error.status}); falling back to the legacy API.`);
+            if (error instanceof EmporiaApiError && FALLBACK_STATUSES.has(error.status)) {
+                this.log?.warn(`Emporia v1 endpoint ${primaryPath} unavailable (${error.status}); falling back to the legacy API.`);
                 return this.request(fallbackPath, 'authtoken');
             }
             throw error;
@@ -106,7 +110,7 @@ export class EmporiaClient {
                 }
             }
             if (!response.ok) {
-                throw new EmporiaApiError(response.status, `Emporia API request failed (${response.status} ${response.statusText})`.trim());
+                throw new EmporiaApiError(response.status, await this.describeFailure(response, path));
             }
             const text = await response.text();
             if (!text) {
@@ -123,6 +127,24 @@ export class EmporiaClient {
     }
     backoff(attempt) {
         return Math.min(1000 * 2 ** attempt, 30_000);
+    }
+    /**
+     * Builds an error message that includes the failing endpoint and a short
+     * response body. Emporia sometimes explains a 400 in the body, and that
+     * detail is what makes a support report actionable.
+     */
+    async describeFailure(response, path) {
+        let body = '';
+        try {
+            const text = await response.text();
+            const compact = text.replace(/\s+/g, ' ').trim();
+            body = compact.length > 300 ? `${compact.slice(0, 300)}...` : compact;
+        }
+        catch {
+            // The body is optional; keep the status line either way.
+        }
+        const status = response.statusText ? `${response.status} ${response.statusText}` : `${response.status}`;
+        return `Emporia API request failed (${status}) at ${path}${body ? `: ${body}` : ''}`;
     }
     retryDelay(response, attempt) {
         const retryAfter = Number(response.headers.get('retry-after'));

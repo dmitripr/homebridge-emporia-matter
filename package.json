@@ -2,7 +2,7 @@
   "name": "homebridge-emporia-matter",
   "displayName": "Emporia Matter",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Expose Emporia Vue energy monitors to Apple Home over Matter, with live power and cumulative energy per circuit.",
   "author": "Dmitri Prigojev",
   "license": "MIT",

@@ -35,5 +35,11 @@ export declare class EmporiaClient {
     private requestWithFallback;
     private request;
     private backoff;
+    /**
+     * Builds an error message that includes the failing endpoint and a short
+     * response body. Emporia sometimes explains a 400 in the body, and that
+     * detail is what makes a support report actionable.
+     */
+    private describeFailure;
     private retryDelay;
 }
