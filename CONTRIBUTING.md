@@ -28,6 +28,18 @@ All four must pass. The packed file list should contain only `dist/`, `docs/`,
 `config.schema.json`, `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `LICENSE`,
 and `package.json`.
 
+`dist/` is committed so that global GitHub installs work without
+devDependencies. Rebuild it before committing and include the output in your
+change:
+
+```bash
+npm run build
+git diff --exit-code -- dist
+```
+
+CI runs the same check; a source change with stale `dist/` output fails the
+build.
+
 ## Tests
 
 - Tests use Vitest and live in `test/`.

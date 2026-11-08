@@ -1,0 +1,11 @@
+export declare function isRecord(value: unknown): value is Record<string, unknown>;
+export declare function asString(value: unknown): string | undefined;
+export declare function asNumber(value: unknown): number | undefined;
+export declare function asBoolean(value: unknown): boolean | undefined;
+export declare function errorMessage(error: unknown): string;
+export declare function redactEmail(email: string): string;
+export declare function sleep(ms: number): Promise<void>;
+export declare function clamp(value: number, min: number, max: number): number;
+export declare function round(value: number, digits?: number): number;
+export declare function unique<T>(values: readonly T[]): T[];
+export declare function safeJsonParse<T>(text: string | undefined): T | undefined;

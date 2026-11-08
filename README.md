@@ -39,9 +39,12 @@ On the machine running Homebridge, as the same user that runs Homebridge:
 npm install -g github:dmitripr/homebridge-emporia-matter
 ```
 
-npm clones the repository, runs the TypeScript build through the `prepare`
-script, and installs the compiled plugin into the global npm prefix that
+npm clones the repository and installs it into the global npm prefix that
 Homebridge scans. Node.js 22.12+ and `git` are required.
+
+The repository includes the compiled `dist/` output, so global installs do not
+need devDependencies or a build step. Local checkouts rebuild automatically
+when dev dependencies are present.
 
 Verify the install:
 
@@ -51,9 +54,8 @@ npm ls -g homebridge-emporia-matter
 
 Then restart Homebridge and configure the plugin as described below.
 
-> npm 11 may warn that the `prepare` script is "not yet covered by
-> allowScripts". The build still runs; if `dist/index.js` is missing after
-> install, use the local tarball method below.
+> npm may warn that the `prepare` script is "not yet covered by allowScripts".
+> That is harmless: the committed `dist/` output is used either way.
 
 ### Docker
 

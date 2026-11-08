@@ -42,7 +42,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:auth": "tsx scripts/test-auth.ts",
-    "prepare": "npm run build",
+    "prepare": "node scripts/prepare.js",
     "prepublishOnly": "npm run lint && npm test",
     "watch": "npm run build && nodemon",
     "pack": "npm pack --dry-run"
