@@ -1,0 +1,46 @@
+{
+  "customerGid": 1,
+  "devices": [
+    {
+      "deviceGid": 2001,
+      "manufacturerDeviceId": "LEGACYDEVICE00000001",
+      "model": "VUE001",
+      "firmware": "1.0.0",
+      "parentDeviceGid": 0,
+      "locationProperties": {
+        "deviceName": "Main Panel",
+        "displayName": "Legacy Home",
+        "timeZone": "UTC"
+      },
+      "channels": [
+        {
+          "deviceGid": 2001,
+          "name": "Main",
+          "channelNum": "1,2,3",
+          "channelMultiplier": 1.0,
+          "channelTypeGid": 0,
+          "type": "Main",
+          "parentChannelNum": null
+        },
+        {
+          "deviceGid": 2001,
+          "name": "Kitchen",
+          "channelNum": "1",
+          "channelMultiplier": 1.0,
+          "channelTypeGid": 1,
+          "type": "FiftyAmp",
+          "parentChannelNum": null
+        },
+        {
+          "deviceGid": 2001,
+          "name": "Oven",
+          "channelNum": "2",
+          "channelMultiplier": 2.0,
+          "channelTypeGid": 22,
+          "type": "FiftyAmp",
+          "parentChannelNum": "1,2,3"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "pluginAlias": "EmporiaMatter",
+  "pluginType": "platform",
+  "singular": true,
+  "headerDisplay": "Expose Emporia Vue circuits to Apple Home over Matter. This plugin publishes Matter accessories only; HAP is not used.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Platform Name",
+        "type": "string",
+        "default": "Emporia Matter"
+      },
+      "email": {
+        "title": "Emporia Email",
+        "type": "string",
+        "format": "email",
+        "description": "Your Emporia Energy account email address."
+      },
+      "password": {
+        "title": "Emporia Password",
+        "type": "string",
+        "description": "Used only for the first sign-in. After that the plugin stores a refresh token in Homebridge storage. Leave blank if a valid token already exists.",
+        "x-schema-form": {
+          "type": "password"
+        }
+      },
+      "pollInterval": {
+        "title": "Poll Interval (seconds)",
+        "type": "integer",
+        "default": 60,
+        "minimum": 60,
+        "maximum": 300,
+        "description": "How often to ask Emporia for new readings. Emporia does not publish a rate limit; 60 seconds matches its 1MIN data and Home Assistant's integration."
+      },
+      "splitChannels": {
+        "title": "One accessory per channel",
+        "type": "boolean",
+        "default": true,
+        "description": "On: each circuit is its own accessory, so it can be placed in its own room (Apple Home assigns rooms per accessory). Off: all circuits share one composed accessory."
+      },
+      "hideMains": {
+        "title": "Hide mains",
+        "type": "boolean",
+        "default": false,
+        "description": "Hide the whole-home mains accessory. Exposing mains and branch circuits together can double-count in Apple Home's Energy tab."
+      },
+      "accessoryType": {
+        "title": "Default accessory type",
+        "type": "string",
+        "enum": [
+          "outlet",
+          "light",
+          "switch"
+        ],
+        "default": "outlet",
+        "description": "Apple Home shows live wattage on the tile only for outlet-typed accessories. Use the Home app's Show As -> Light afterwards if you prefer a light tile."
+      },
+      "solar": {
+        "title": "Allow solar / export",
+        "type": "boolean",
+        "default": false,
+        "description": "Allow negative power and report exported energy. Leave off for import-only circuits."
+      },
+      "nominalVoltage": {
+        "title": "Nominal voltage (optional)",
+        "type": "number",
+        "minimum": 100,
+        "maximum": 300,
+        "description": "When set, the plugin also reports voltage and derives current from power. This is an estimate, not a measurement. Leave blank to publish active power only."
+      },
+      "channels": {
+        "title": "Channel overrides",
+        "type": "array",
+        "description": "Optional per-channel names, visibility, and accessory types. Channel IDs look like Mains, Branch_1, or Merged_100.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "deviceGid": {
+              "title": "Device GID (optional)",
+              "type": "integer",
+              "description": "Leave blank to apply the override to every monitor with this channel ID."
+            },
+            "channelId": {
+              "title": "Channel ID",
+              "type": "string",
+              "description": "Mains, Branch_1 ... Branch_16, Merged_100, Balance, or TotalUsage."
+            },
+            "name": {
+              "title": "Name",
+              "type": "string"
+            },
+            "hide": {
+              "title": "Hide",
+              "type": "boolean"
+            },
+            "accessoryType": {
+              "title": "Accessory type",
+              "type": "string",
+              "enum": [
+                "outlet",
+                "light",
+                "switch"
+              ]
+            }
+          },
+          "required": [
+            "channelId"
+          ]
+        }
+      }
+    },
+    "required": [
+      "name",
+      "email"
+    ]
+  },
+  "layout": [
+    {
+      "type": "fieldset",
+      "title": "Emporia account",
+      "expandable": false,
+      "items": [
+        "name",
+        "email",
+        "password"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Polling and layout",
+      "expandable": true,
+      "expanded": true,
+      "items": [
+        "pollInterval",
+        "splitChannels",
+        "hideMains",
+        "accessoryType",
+        "solar",
+        "nominalVoltage"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Channel overrides",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        "channels"
+      ]
+    }
+  ]
+}

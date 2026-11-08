@@ -1,0 +1,105 @@
+{
+  "devices": [
+    {
+      "device_type": "MONITOR",
+      "device_id": "TESTDEVICE000000000001",
+      "display_name": "Test Home",
+      "model": "VUE002",
+      "firmware": "Vue2-000",
+      "device_gid": 1001,
+      "time_zone": "America/Denver",
+      "channels": [
+        {
+          "name": null,
+          "multiplier": 1.0,
+          "channel_type_gid": null,
+          "channel_id": "Mains",
+          "parent_channel_id": null,
+          "channel_classification": "MAIN",
+          "has_data": true
+        },
+        {
+          "name": null,
+          "multiplier": 1.0,
+          "channel_type_gid": null,
+          "channel_id": "Mains_A",
+          "parent_channel_id": "Mains",
+          "channel_classification": "MAIN",
+          "has_data": true
+        },
+        {
+          "name": "Kitchen",
+          "multiplier": 1.0,
+          "channel_type_gid": 21,
+          "channel_id": "Branch_1",
+          "parent_channel_id": null,
+          "channel_classification": "FIFTY_AMP",
+          "has_data": true
+        },
+        {
+          "name": "Garage",
+          "multiplier": 2.0,
+          "channel_type_gid": 18,
+          "channel_id": "Branch_2",
+          "parent_channel_id": null,
+          "channel_classification": "FIFTY_AMP",
+          "has_data": true
+        },
+        {
+          "name": "Unused",
+          "multiplier": 1.0,
+          "channel_type_gid": 1,
+          "channel_id": "Branch_3",
+          "parent_channel_id": null,
+          "channel_classification": "FIFTY_AMP",
+          "has_data": false
+        },
+        {
+          "name": "Oven",
+          "multiplier": 1.0,
+          "channel_type_gid": 22,
+          "channel_id": "Merged_100",
+          "parent_channel_id": null,
+          "channel_classification": "FIFTY_AMP",
+          "has_data": true
+        },
+        {
+          "name": null,
+          "multiplier": 1.0,
+          "channel_type_gid": null,
+          "channel_id": "Balance",
+          "parent_channel_id": null,
+          "channel_classification": "BALANCE",
+          "has_data": true
+        }
+      ]
+    },
+    {
+      "device_type": "MONITOR",
+      "device_id": "TESTDEVICE000000000002",
+      "display_name": "Garage Panel",
+      "model": "VUE003",
+      "firmware": "Vue3-000",
+      "device_gid": 1002,
+      "time_zone": "America/Denver",
+      "channels": [
+        {
+          "name": null,
+          "multiplier": 1.0,
+          "channel_id": "Mains",
+          "parent_channel_id": null,
+          "channel_classification": "MAIN",
+          "has_data": true
+        },
+        {
+          "name": "EV charger",
+          "multiplier": 1.0,
+          "channel_id": "Branch_1",
+          "parent_channel_id": null,
+          "channel_classification": "FIFTY_AMP",
+          "has_data": true
+        }
+      ]
+    }
+  ]
+}

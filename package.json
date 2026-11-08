@@ -1,0 +1,61 @@
+{
+  "name": "homebridge-emporia-matter",
+  "displayName": "Emporia Matter",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Expose Emporia Vue energy monitors to Apple Home over Matter, with live power and cumulative energy per circuit.",
+  "author": "Dmitri Prigojev",
+  "license": "MIT",
+  "homepage": "https://github.com/dmitripr/homebridge-emporia-matter#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dmitripr/homebridge-emporia-matter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dmitripr/homebridge-emporia-matter/issues"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "supports-matter",
+    "emporia",
+    "emporia-vue",
+    "energy",
+    "matter"
+  ],
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "docs",
+    "config.schema.json",
+    "README.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0 || ^26.0.0",
+    "homebridge": "^2.5.0"
+  },
+  "scripts": {
+    "build": "rimraf ./dist && tsc",
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:auth": "tsx scripts/test-auth.ts",
+    "prepublishOnly": "npm run lint && npm test && npm run build",
+    "watch": "npm run build && nodemon",
+    "pack": "npm pack --dry-run"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.6",
+    "eslint": "^10.14.0",
+    "homebridge": "^2.5.0",
+    "nodemon": "^3.1.14",
+    "rimraf": "^6.1.4",
+    "tsx": "^4.20.6",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.1.0"
+  }
+}
