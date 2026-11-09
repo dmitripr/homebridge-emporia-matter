@@ -32,4 +32,25 @@ export default tseslint.config(
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
+  {
+    files: ['homebridge-ui/public/**/*.js'],
+    languageOptions: {
+      globals: {
+        clearTimeout: 'readonly',
+        document: 'readonly',
+        homebridge: 'readonly',
+        setTimeout: 'readonly',
+        window: 'readonly',
+      },
+    },
+  },
+  {
+    files: ['homebridge-ui/server.js'],
+    languageOptions: {
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+      },
+    },
+  },
 );

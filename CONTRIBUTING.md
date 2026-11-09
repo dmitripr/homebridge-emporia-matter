@@ -25,8 +25,8 @@ npm pack --dry-run
 ```
 
 All four must pass. The packed file list should contain only `dist/`, `docs/`,
-`scripts/prepare.js`, `config.schema.json`, `README.md`, `CHANGELOG.md`,
-`CONTRIBUTING.md`, `LICENSE`, and `package.json`.
+`homebridge-ui/`, `scripts/prepare.js`, `config.schema.json`, `README.md`,
+`CHANGELOG.md`, `CONTRIBUTING.md`, `LICENSE`, and `package.json`.
 
 `dist/` is committed so that global GitHub installs work without
 devDependencies. Rebuild it before committing and include the output in your

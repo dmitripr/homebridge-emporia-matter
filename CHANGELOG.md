@@ -5,6 +5,25 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-11-08
+
+### Added
+
+- A custom settings page with a **Discover channels** button. It fetches the
+  channels from the Emporia API and lists them in an editable table, so
+  per-channel names, visibility, and accessory types can be set without editing
+  `config.json`.
+- Only deviations from the defaults are written to `channels`, keeping the saved
+  config small.
+- Channel discovery has unit tests.
+
+### Changed
+
+- The settings page explains that Apple Home renders tile wattage and the Energy
+  view on iOS 27 or later.
+- README now describes how cumulative energy appears in Apple Home, including
+  the whole-home total versus per-device itemisation.
+
 ## [0.1.2] - 2026-11-08
 
 ### Fixed
@@ -49,6 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI matrix for Node 22/24/26 and tag-based npm publishing with provenance.
 - Environment-based live authentication smoke test.
 
+[0.2.0]: https://github.com/dmitripr/homebridge-emporia-matter/releases/tag/v0.2.0
 [0.1.2]: https://github.com/dmitripr/homebridge-emporia-matter/releases/tag/v0.1.2
 [0.1.1]: https://github.com/dmitripr/homebridge-emporia-matter/releases/tag/v0.1.1
 [0.1.0]: https://github.com/dmitripr/homebridge-emporia-matter/releases/tag/v0.1.0

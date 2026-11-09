@@ -12,8 +12,8 @@ This plugin is **Matter-only**. It does not publish HAP accessories and does not
 ## What you get
 
 - One Matter accessory per branch circuit, plus the whole-home mains feed (both configurable).
-- Live active power in watts on the accessory tile.
-- Cumulative imported energy in kWh, integrated locally and persisted across restarts.
+- Live active power in watts on the accessory tile (Apple Home shows this on iOS 27 or later).
+- Cumulative imported energy in kWh, integrated locally and persisted across restarts. Apple Home counts it in the home's Energy total on iOS 27 or later.
 - Optional voltage and current estimates when you configure a nominal voltage.
 - Optional solar/export support with a separate exported-energy total.
 - Stable Matter identities that survive restarts, with automatic rotation when the channel layout changes.
@@ -24,15 +24,17 @@ This plugin is **Matter-only**. It does not publish HAP accessories and does not
 - Homebridge **2.5.0 or newer** with Matter enabled on the bridge.
 - Node.js **22.12+**, **24**, or **26**.
 - An Emporia Energy account with a Vue monitor that reports to the Emporia cloud.
-- Apple Home with a home hub (Apple TV, HomePod, or iPad) for remote access and automations.
+- Apple Home on **iOS/iPadOS/tvOS 27 or later** to see live wattage and the Energy view. Older versions can pair the bridge and switch the outlets, but do not display Matter power or energy.
+- A home hub (Apple TV, HomePod, or iPad) for remote access and automations.
 
 ## Install
 
 ### Homebridge UI
 
 Open **Plugins**, search for `Emporia Matter` (or `homebridge-emporia-matter`),
-and install it. Enter your Emporia email and password in the plugin settings,
-then restart Homebridge.
+and install it. Enter your Emporia email and password in the plugin settings;
+the page discovers your circuits so you can rename or hide them before saving.
+Then restart Homebridge.
 
 ### Command line
 
@@ -112,7 +114,7 @@ If you prefer to build on the machine first, or if install scripts are blocked:
 git clone https://github.com/dmitripr/homebridge-emporia-matter.git
 cd homebridge-emporia-matter
 npm pack
-npm install -g ./homebridge-emporia-matter-0.1.2.tgz
+npm install -g ./homebridge-emporia-matter-0.2.0.tgz
 ```
 
 After installing, add the platform configuration and restart Homebridge.
@@ -131,8 +133,11 @@ The plugin refuses to start on Homebridge versions older than 2.5.0 and logs an 
 ## Configuration
 
 In the Homebridge UI, open the plugin settings and enter your Emporia email and
-password; the form exposes every option below. For a manual setup, add a
-platform block to `config.json`.
+password. The settings page discovers your monitors and lists every channel in
+an editable table: rename a channel, untick **Show** to hide it, or pick a
+different accessory type. Changes are saved with the normal **Save** button.
+Click **Discover channels** again after adding a monitor or a CT clamp. For a
+manual setup, add a platform block to `config.json`.
 
 Minimal `config.json`:
 
@@ -184,14 +189,23 @@ A fuller example:
 | `pollInterval` | `60` | Seconds between usage requests. Minimum `60`, maximum `300`. Emporia does not publish a rate limit; 60 seconds matches its 1-minute data. |
 | `splitChannels` | `true` | `true`: one accessory per channel, so each circuit can live in its own room. `false`: one composed accessory per monitor with all circuits as parts. |
 | `hideMains` | `false` | Hide the whole-home mains accessory. See the double-counting note below. |
-| `accessoryType` | `outlet` | `outlet`, `light`, or `switch`. Apple Home shows live wattage on the tile for outlet-typed accessories; use Show As → Light afterwards if you prefer a light tile. |
+| `accessoryType` | `outlet` | `outlet`, `light`, or `switch`. Apple Home shows live wattage on the tile for outlet-typed accessories on iOS 27 or later; use Show As → Light afterwards if you prefer a light tile. |
 | `solar` | `false` | Allow negative power and report exported energy. Leave off for import-only circuits. |
 | `nominalVoltage` | — | Optional, 100–300 V. When set, the plugin publishes that voltage and derives current from power. This is an estimate, not a measurement. |
-| `channels` | `[]` | Per-channel overrides: `deviceGid`, `channelId`, `name`, `hide`, `accessoryType`. |
+| `channels` | `[]` | Per-channel overrides: `deviceGid`, `channelId`, `name`, `hide`, `accessoryType`. The settings page manages this list for you. |
 
 ### Channel overrides
 
-Channel IDs look like `Mains`, `Mains_A`, `Branch_1` … `Branch_16`, or `Merged_100`. An override without `deviceGid` applies to that channel ID on every monitor. An override with `deviceGid` applies only to one monitor.
+The settings page builds this list for you. It signs in with the saved
+credentials (or the stored refresh token), fetches every channel, and shows a
+row per channel with the Emporia name as the placeholder. Only rows that differ
+from the defaults are written to `config.channels`, so the saved config stays
+small and future channel changes keep their default behavior.
+
+In `config.json`, channel IDs look like `Mains`, `Mains_A`, `Branch_1` …
+`Branch_16`, or `Merged_100`. An override without `deviceGid` applies to that
+channel ID on every monitor. An override with `deviceGid` applies only to one
+monitor.
 
 ```json
 {
@@ -206,14 +220,47 @@ Branch circuits are exposed by default. Phase channels (`Mains_A`, `Mains_B`, �
 
 ## What appears in Apple Home
 
-- **Power:** the tile shows current active power for `outlet` accessories.
-- **Energy:** the accessory reports cumulative imported energy, and exported energy when `solar` is enabled.
+- **Power:** on iOS 27 or later, the tile shows current active power in watts for
+  `outlet` accessories. The plugin publishes the same power for every type, but
+  Apple Home only renders it on outlet tiles.
+- **Energy:** the accessory reports cumulative imported energy, and exported
+  energy when `solar` is enabled. On iOS 27 or later the Home app's **Energy**
+  view counts this in the home's total usage and history.
 - **Switch:** the on/off control is cosmetic. This plugin is a meter, not a relay: commands are accepted and immediately restored to "on" so the tile does not appear to turn off.
+
+### How cumulative energy is shown
+
+The plugin publishes Matter `ElectricalEnergyMeasurement.cumulativeEnergyImported`
+in milliwatt-hours. It is a running total from the moment the plugin first
+started tracking the channel, not a lifetime value from Emporia.
+
+In the Apple Home app on iOS 27 or later:
+
+1. Tap **Energy** (or **Grid Forecast**) in the Home app.
+2. **Power** shows live total wattage across energy-capable accessories.
+3. **Usages** shows historical consumption for the home, grouped by day, week,
+   month, six months, or year. Its device menu lists accessories that are paired
+   directly with Apple Home.
+
+Two things are easy to misread:
+
+- The **whole-home total includes** this plugin's measurements.
+- **This plugin's channels are not itemized** in the per-device list, because
+  Apple Home only lists accessories paired directly with Apple Home, not
+  accessories behind a bridge. This is an Apple policy, not a plugin setting.
+  All Homebridge Matter accessories, from any plugin, behave the same way.
+
+Other Matter controllers (Home Assistant, SmartThings, Homey, and Matter
+diagnostic tools) can read the same `ElectricalPowerMeasurement` and
+`ElectricalEnergyMeasurement` clusters directly and will show per-channel values.
 
 ## Apple Home limitations
 
 These are limitations of Apple Home and Matter, not bugs in the plugin:
 
+- **Live wattage and the Energy view need iOS 27 or later.** On older versions
+  the accessories still work as switches, but Apple Home does not render the
+  Matter power or energy clusters.
 - **Mains and branch circuits double-count.** Apple Home's Energy view sums energy across accessories in the home. If you expose both the mains feed and its branch circuits, the home total is roughly twice the real consumption. Either set `hideMains: true`, hide the branches, or accept the doubled total.
 - **Bridged accessories are not itemized in the Energy view.** Apple Home lists per-device energy only for directly paired accessories. All accessories from this plugin are bridged, so they contribute to the home total but do not appear as individual rows. Tile wattage still works.
 - **Rooms are assigned per accessory.** That is why `splitChannels` defaults to `true`: with grouped mode, every circuit shares one accessory and therefore one room.
@@ -226,7 +273,7 @@ The Emporia API reports energy over a short window, not a lifetime counter. The 
 
 - Totals survive Homebridge restarts.
 - Energy is integrated only while Homebridge is running and readings are arriving. A single integration step is capped at 10 minutes, so long gaps are only partially estimated rather than fully backfilled.
-- Deleting `emporia-matter-state.json` resets the totals.
+- Deleting `emporia-matter-state.json` resets the totals. Apple Home sees the counter restart from zero and treats subsequent values as new consumption.
 - A negative reading is clamped to `0 W` unless `solar` is enabled, in which case it contributes to exported energy.
 
 ## Stale readings

@@ -2,7 +2,8 @@
   "pluginAlias": "EmporiaMatter",
   "pluginType": "platform",
   "singular": true,
-  "headerDisplay": "Expose Emporia Vue circuits to Apple Home over Matter. This plugin publishes Matter accessories only; HAP is not used.",
+  "customUi": true,
+  "headerDisplay": "Expose Emporia Vue circuits to Apple Home over Matter. This plugin publishes Matter accessories only; HAP is not used. Apple Home shows tile wattage on iOS 27 or later; energy feeds the home total.",
   "schema": {
     "type": "object",
     "properties": {
@@ -54,7 +55,7 @@
           "switch"
         ],
         "default": "outlet",
-        "description": "Apple Home shows live wattage on the tile only for outlet-typed accessories. Use the Home app's Show As -> Light afterwards if you prefer a light tile."
+        "description": "Apple Home shows live wattage on the tile only for outlet-typed accessories, and only on iOS 27 or later. Use the Home app's Show As -> Light afterwards if you prefer a light tile."
       },
       "solar": {
         "title": "Allow solar / export",
@@ -72,7 +73,7 @@
       "channels": {
         "title": "Channel overrides",
         "type": "array",
-        "description": "Optional per-channel names, visibility, and accessory types. Channel IDs look like Mains, Branch_1, or Merged_100.",
+        "description": "Per-channel names, visibility, and accessory types. Use the channel table at the top of the settings page to edit these; the array is kept for manual config.json edits.",
         "items": {
           "type": "object",
           "properties": {
@@ -138,15 +139,6 @@
         "accessoryType",
         "solar",
         "nominalVoltage"
-      ]
-    },
-    {
-      "type": "fieldset",
-      "title": "Channel overrides",
-      "expandable": true,
-      "expanded": false,
-      "items": [
-        "channels"
       ]
     }
   ]
