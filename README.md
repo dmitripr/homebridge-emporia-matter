@@ -28,27 +28,19 @@ This plugin is **Matter-only**. It does not publish HAP accessories and does not
 
 ## Install
 
-The plugin is not published to npm yet. Install it directly from the public
-GitHub repository.
+### Homebridge UI
 
-### Install from GitHub
+Open **Plugins**, search for `Emporia Matter` (or `homebridge-emporia-matter`),
+and install it. Enter your Emporia email and password in the plugin settings,
+then restart Homebridge.
+
+### Command line
 
 On the machine running Homebridge, as the same user that runs Homebridge:
 
 ```bash
-npm install -g github:dmitripr/homebridge-emporia-matter --install-links
+npm install -g homebridge-emporia-matter
 ```
-
-npm clones the repository and installs a real copy into the global npm prefix
-that Homebridge scans. Node.js 22.12+ and `git` are required.
-
-`--install-links` matters: without it, npm 11 can symlink a global git install
-to a temporary cache clone, leaving a broken package after the cache is
-cleaned.
-
-The repository includes the compiled `dist/` output, so global installs do not
-need devDependencies or a build step. Local checkouts rebuild automatically
-when dev dependencies are present.
 
 Verify the install:
 
@@ -56,10 +48,8 @@ Verify the install:
 npm ls -g homebridge-emporia-matter
 ```
 
-Then restart Homebridge and configure the plugin as described below.
-
-> npm may warn that the `prepare` script is "not yet covered by allowScripts".
-> That is harmless: the committed `dist/` output is used either way.
+Node.js 22.12+ is required. Then restart Homebridge and configure the plugin
+as described below.
 
 #### Homebridge with a managed plugin directory
 
@@ -77,7 +67,7 @@ instead:
 ```bash
 npm uninstall -g homebridge-emporia-matter
 cd /var/lib/homebridge
-npm install github:dmitripr/homebridge-emporia-matter --install-links --save
+npm install homebridge-emporia-matter --save
 ```
 
 Verify that the plugin is in the directory named by `-P`:
@@ -86,12 +76,31 @@ Verify that the plugin is in the directory named by `-P`:
 ls /var/lib/homebridge/node_modules/homebridge-emporia-matter/dist/index.js
 ```
 
+### Install from GitHub
+
+To test unreleased changes, install from the repository instead of npm:
+
+```bash
+npm install -g github:dmitripr/homebridge-emporia-matter --install-links
+```
+
+`--install-links` matters: without it, npm 11 can symlink a global git install
+to a temporary cache clone, leaving a broken package after the cache is
+cleaned.
+
+The repository includes the compiled `dist/` output, so GitHub installs do not
+need devDependencies or a build step. For a Homebridge-managed plugin directory,
+run the same command after `cd /var/lib/homebridge` and add `--save`.
+
+> npm may warn that the `prepare` script is "not yet covered by allowScripts".
+> That is harmless: the committed `dist/` output is used either way.
+
 ### Docker
 
 Run the install inside the Homebridge container, then restart it:
 
 ```bash
-docker exec -it <container-name> npm install -g github:dmitripr/homebridge-emporia-matter --install-links
+docker exec -it <container-name> npm install -g homebridge-emporia-matter
 docker restart <container-name>
 ```
 
@@ -105,12 +114,6 @@ cd homebridge-emporia-matter
 npm pack
 npm install -g ./homebridge-emporia-matter-0.1.2.tgz
 ```
-
-### Homebridge UI (after the npm release)
-
-Once the package is published, open **Plugins**, search for `Emporia Matter`,
-and install it. Until then, use one of the methods above and refresh the
-Homebridge UI.
 
 After installing, add the platform configuration and restart Homebridge.
 

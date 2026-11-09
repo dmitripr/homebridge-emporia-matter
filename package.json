@@ -26,6 +26,7 @@
   "files": [
     "dist",
     "docs",
+    "scripts/prepare.js",
     "config.schema.json",
     "README.md",
     "CHANGELOG.md",

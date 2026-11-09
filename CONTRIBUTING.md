@@ -25,8 +25,8 @@ npm pack --dry-run
 ```
 
 All four must pass. The packed file list should contain only `dist/`, `docs/`,
-`config.schema.json`, `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `LICENSE`,
-and `package.json`.
+`scripts/prepare.js`, `config.schema.json`, `README.md`, `CHANGELOG.md`,
+`CONTRIBUTING.md`, `LICENSE`, and `package.json`.
 
 `dist/` is committed so that global GitHub installs work without
 devDependencies. Rebuild it before committing and include the output in your
@@ -88,6 +88,38 @@ Keep commits focused. Describe the user-visible effect in the subject line.
 - Call out any change that affects Matter identity, storage format, or Apple
   Home presentation.
 - Update `README.md` and `CHANGELOG.md` when behavior or configuration changes.
+
+## Publishing
+
+Releases are published to npm by the tag-triggered workflow in
+`.github/workflows/release.yml`. The repository needs an `NPM_TOKEN` secret
+containing an npm automation token:
+
+```bash
+gh secret set NPM_TOKEN --repo dmitripr/homebridge-emporia-matter
+```
+
+Then bump the version and push a matching tag:
+
+```bash
+npm version patch --no-git-tag-version
+npm run build
+git commit -am "chore: release vX.Y.Z"
+git push
+git tag vX.Y.Z
+git push origin vX.Y.Z
+```
+
+The workflow checks that the tag matches `package.json`, runs lint, tests, and
+the build, and publishes with provenance. To publish manually instead:
+
+```bash
+npm login
+npm publish
+```
+
+Do not publish locally and push the tag for the same version: the second
+publisher will be rejected.
 
 ## Security
 
